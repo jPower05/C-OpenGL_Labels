@@ -77,6 +77,8 @@ void setupRC(void)
 	glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
 
 	//gluOrtho2D(-100.0, 100.0, -100, 100.0);
+
+
 }
 
 int main(int argc, char* argv[])
