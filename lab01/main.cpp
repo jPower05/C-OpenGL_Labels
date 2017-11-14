@@ -15,6 +15,8 @@ int windowHeight;
 float x = -25.0f;
 float y = 25.0f;
 
+//THIS IS A TEST
+
 
 
 void renderScene(void)
