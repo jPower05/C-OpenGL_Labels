@@ -1,103 +1,180 @@
 #include<Windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+#define _USE_MATH_DEFINES // for C
+#include <math.h>
 #include "freeglut.h"
 #include<iostream>
 
+
+//LAB 3 TRIANGLES ..
+
+
+void points();
+void circlePoints();
+void lineLoop();
+void circleLines();
+void linesWidth();
+void lineStipple();
+void drawHouse();
+
+
 using namespace std;
 
-void update();
+GLfloat sizes[2];
+GLfloat step;
+GLfloat curSize;
 
 
-int windowWidth;
-int windowHeight;
+//THIS IS A TEST
 
-float x = -25.0f;
-float y = 25.0f;
+void points() {
 
+	glBegin(GL_POINTS);
+	glVertex3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(50.0f, 40.0f, 0.0f);
+	glVertex3f(50.0f, 50.0f, 50.0f);
+	glEnd();
+
+}
+
+void lineLoop()
+{
+	glBegin(GL_LINE_STRIP);
+	glVertex3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(50.0f, 50.0f, 0.0f);
+	glVertex3f(50.0f, 100.0f, 0.0f);
+	glEnd();
+}
+
+void drawHouse() {
+	glBegin(GL_LINE_STRIP);
+
+	glVertex3f(0.0f, 50.0f, 0.0f);
+	glVertex3f(0.0f, -20.0f, 0.0f);
+	glVertex3f(50.0f, -20.0f, 0.0f);
+	glVertex3f(50.0f, 50.0f, 0.0f);
+	glVertex3f(25.0f, 75.0f, 0.0f);
+	glVertex3f(0.0f, 50.0f, 0.0f);
+	glEnd();
+
+
+
+
+	//glVertex3f(50.0f, 50.0f, 0.0f);
+	//glVertex3f(50.0f, 100.0f, 0.0f);
+	glEnd();
+}
+
+void circlePoints()
+{
+	float x, y, angle;
+	for (angle = 0.0f; angle <= (2.0f * M_PI); angle += 0.01f)
+	{
+		x = 50.0f * sin(angle);
+		y = 50.0f * cos(angle);
+		glPointSize(curSize);
+		glBegin(GL_POINTS);
+		glVertex3f(x, y, 0.0f);
+		glEnd();
+		curSize += step;
+	}
+}
+
+
+void circleLines()
+{
+	glBegin(GL_LINE_LOOP);
+	float x, y, angle;
+	for (angle = 0.0f; angle <= (2.0f * M_PI); angle += 0.01f)
+	{
+		x = 50.0f * sin(angle);
+		y = 50.0f * cos(angle);
+		glVertex3f(x, y, 0.0f);
+	}
+	glEnd();
+}
+
+void lineStipple()
+{
+	float y;
+	int factor = 3;
+	short pattern = 0x5555;
+
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	for (y = -90.0f; y < 90.0f; y += 20.0f)
+	{
+		glLineStipple(factor, pattern);
+
+		glBegin(GL_LINES);
+		glVertex2f(-80.0f, y);
+		glVertex2f(80.0f, y);
+		glEnd();
+	}
+}
 
 
 void renderScene(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glColor3f(1.0f, 0.0f, 0.0f);
-	//glRectf(-25.0f, 25.0f, 25.0f, -25.0f);
-	glRectf(x, y, x + 50, y - 50);
+	//points();
+	//circlePoints();
+	//lineLoop();
+	//circleLines();
+	//linesWidth();
+	lineStipple();
+	//drawHouse();
 
 	glFlush();
 }
 
-void timerFunction(int value)
+void linesWidth()
 {
-	update();
-	//33 is the value the method will wait until executing
-	glutTimerFunc(33, timerFunction, 1);
-	glutPostRedisplay();
-}
+	float y;
 
-void update() {
-	static float xstep = 1.0f;
-	static float ystep = 1.0f;
-	if (x > windowWidth - 50 || x < -windowWidth)
-		xstep = -xstep;
+	glClear(GL_COLOR_BUFFER_BIT);
 
-	if (y > windowHeight || y < -windowHeight + 50)
-		ystep = -ystep;
-
-	x += xstep;
-	y += ystep;
-	cout << "x:" << x << " y:" << y << endl;
-}
-
-void changeSize(int w, int h)
-{
-	glViewport(0, 0, w, h);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-
-	float aspectRatio = (float)w / (float)h;
-	if (w <= h)
+	for (y = -90.0f; y < 90.0f; y += 20.0f)
 	{
-		windowWidth = 100;
-		windowHeight = 100 / aspectRatio;
-		glOrtho(-100.0, 100.0, -windowHeight, windowHeight, 1.0, -1.0);
-	}
-	else
-	{
-		windowWidth = 100 * aspectRatio;
-		windowHeight = 100;
-		glOrtho(-windowWidth, windowWidth, -100.0, 100.0, 1.0, -1.0);
+		glLineWidth(curSize);
+
+		glBegin(GL_LINES);
+		glVertex2f(-80.0f, y);
+		glVertex2f(80.0f, y);
+		glEnd();
+
+		curSize += 1.0f;
 	}
 }
 
-void setupRC(void)
+
+void setupRC()
 {
-	glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+	//glGetFloatv(GL_POINT_SIZE_RANGE, sizes);
+	//glGetFloatv(GL_POINT_SIZE_GRANULARITY, &step);
+	//curSize = sizes[0];
 
-	//gluOrtho2D(-100.0, 100.0, -100, 100.0);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
+	glEnable(GL_LINE_STIPPLE);
+
+	glColor3f(1.0f, 1.0f, 0.0f);
+
+	glOrtho(-100.0f, 100.0f, -100.0f, 100.0f, -100.0f, 100.0f);
 
 }
 
 int main(int argc, char* argv[])
 {
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA);
-	glutCreateWindow("Hello OpenGL");
+	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+	glutCreateWindow("lab04");
+	glutInitWindowSize(800, 600);
 	glutDisplayFunc(renderScene);
-	glutTimerFunc(33, timerFunction, 1);
-
-
-	glutReshapeFunc(changeSize);
-
-
-
 	setupRC();
-
 	glutMainLoop();
-	
 
 	return 0;
 }
