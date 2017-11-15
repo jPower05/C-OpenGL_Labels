@@ -9,171 +9,93 @@
 
 //LAB 3 TRIANGLES ..
 
+void triangle();
+void trianglesStrip();
+void triangleFan();
+void triangleCircle();
 
-void points();
-void circlePoints();
-void lineLoop();
-void circleLines();
-void linesWidth();
-void lineStipple();
-void drawHouse();
+void triangle() {
+	glBegin(GL_TRIANGLES);
 
+	glVertex2f(0.0f, 0.0f);    // V0
+	glVertex2f(25.0f, 25.0f);  // V1
+	glVertex2f(50.0f, 0.0f);   // V2
 
-using namespace std;
+	glVertex2f(-50.0f, 0.0f);  // V3
+	glVertex2f(-75.0f, 50.0f); // V4
+	glVertex2f(-25.0f, 0.0f);  // V5
 
-GLfloat sizes[2];
-GLfloat step;
-GLfloat curSize;
+	glEnd();
+}
 
+void trianglesStrip() {
+	glBegin(GL_TRIANGLE_STRIP);
+	glVertex2f(0.0f, 0.0f);    // V0
+	glVertex2f(50.0f, 0.0f);   // V1
+	glVertex2f(25.0f, 25.0f);  // V2
+	glVertex2f(75.0f, 25.0f);  // V3
+	glVertex2f(50.0f, 50.0f);  // V4
+	glEnd();
+}
 
-//THIS IS A TEST
+void triangleFan() {
+	glBegin(GL_TRIANGLE_FAN);
+	glVertex2f(0.0f, 0.0f);
+	glVertex2f(0.0f, 50.0f);
+	glVertex2f(25.0f, 30.0f);
+	glVertex2f(40.0f, 0.0f);
+	glVertex2f(25.0f, -30.0f);
+	glEnd();
+}
 
-void points() {
+void triangleCircle() {
 
-	glBegin(GL_POINTS);
+	glBegin(GL_TRIANGLE_FAN);
 	glVertex3f(0.0f, 0.0f, 0.0f);
-	glVertex3f(50.0f, 40.0f, 0.0f);
-	glVertex3f(50.0f, 50.0f, 50.0f);
-	glEnd();
-
-}
-
-void lineLoop()
-{
-	glBegin(GL_LINE_STRIP);
-	glVertex3f(0.0f, 0.0f, 0.0f);
-	glVertex3f(50.0f, 50.0f, 0.0f);
-	glVertex3f(50.0f, 100.0f, 0.0f);
-	glEnd();
-}
-
-void drawHouse() {
-	glBegin(GL_LINE_STRIP);
-
-	glVertex3f(0.0f, 50.0f, 0.0f);
-	glVertex3f(0.0f, -20.0f, 0.0f);
-	glVertex3f(50.0f, -20.0f, 0.0f);
-	glVertex3f(50.0f, 50.0f, 0.0f);
-	glVertex3f(25.0f, 75.0f, 0.0f);
-	glVertex3f(0.0f, 50.0f, 0.0f);
-	glEnd();
-
-
-
-
-	//glVertex3f(50.0f, 50.0f, 0.0f);
-	//glVertex3f(50.0f, 100.0f, 0.0f);
-	glEnd();
-}
-
-void circlePoints()
-{
 	float x, y, angle;
-	for (angle = 0.0f; angle <= (2.0f * M_PI); angle += 0.01f)
+	for (angle = 0.0f; angle < (2.0f*M_PI); angle += (M_PI / 8.0f))
 	{
-		x = 50.0f * sin(angle);
-		y = 50.0f * cos(angle);
-		glPointSize(curSize);
-		glBegin(GL_POINTS);
-		glVertex3f(x, y, 0.0f);
-		glEnd();
-		curSize += step;
-	}
-}
+		x = 50.0f*sin(angle);
+		y = 50.0f*cos(angle);
 
-
-void circleLines()
-{
-	glBegin(GL_LINE_LOOP);
-	float x, y, angle;
-	for (angle = 0.0f; angle <= (2.0f * M_PI); angle += 0.01f)
-	{
-		x = 50.0f * sin(angle);
-		y = 50.0f * cos(angle);
-		glVertex3f(x, y, 0.0f);
+		glVertex2f(x, y);
 	}
 	glEnd();
+
 }
-
-void lineStipple()
-{
-	float y;
-	int factor = 3;
-	short pattern = 0x5555;
-
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	for (y = -90.0f; y < 90.0f; y += 20.0f)
-	{
-		glLineStipple(factor, pattern);
-
-		glBegin(GL_LINES);
-		glVertex2f(-80.0f, y);
-		glVertex2f(80.0f, y);
-		glEnd();
-	}
-}
-
 
 void renderScene(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
-
-	//points();
-	//circlePoints();
-	//lineLoop();
-	//circleLines();
-	//linesWidth();
-	lineStipple();
-	//drawHouse();
+	//triangle();
+	//trianglesStrip();
+	//triangleFan();
+	triangleCircle();
 
 	glFlush();
 }
 
-void linesWidth()
+void setupRC(void)
 {
-	float y;
+	//set triangles to be line only
+	glPolygonMode(GL_FRONT, GL_LINE);
 
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	for (y = -90.0f; y < 90.0f; y += 20.0f)
-	{
-		glLineWidth(curSize);
-
-		glBegin(GL_LINES);
-		glVertex2f(-80.0f, y);
-		glVertex2f(80.0f, y);
-		glEnd();
-
-		curSize += 1.0f;
-	}
-}
-
-
-void setupRC()
-{
-	//glGetFloatv(GL_POINT_SIZE_RANGE, sizes);
-	//glGetFloatv(GL_POINT_SIZE_GRANULARITY, &step);
-	//curSize = sizes[0];
+	glPolygonMode(GL_BACK, GL_LINE);
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-	glEnable(GL_LINE_STIPPLE);
-
-	glColor3f(1.0f, 1.0f, 0.0f);
-
+	glColor3f(0.0f, 1.0f, 0.0f);
 	glOrtho(-100.0f, 100.0f, -100.0f, 100.0f, -100.0f, 100.0f);
-
 }
 
 int main(int argc, char* argv[])
 {
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
-	glutCreateWindow("lab04");
-	glutInitWindowSize(800, 600);
+	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA);
+	glutCreateWindow("Lab 05");
 	glutDisplayFunc(renderScene);
+
 	setupRC();
+
 	glutMainLoop();
 
 	return 0;
