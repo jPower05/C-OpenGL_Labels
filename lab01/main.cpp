@@ -7,7 +7,7 @@
 #include<iostream>
 
 
-//LAB 3 TRIANGLES ..
+//LAB 4 3D Objects ..
 
 void triangle();
 void trianglesStrip();
