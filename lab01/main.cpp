@@ -6,84 +6,87 @@
 #include "freeglut.h"
 #include<iostream>
 
-
+#define GL_PI 3.1415
 //LAB 4 3D Objects ..
 
-void triangle();
-void trianglesStrip();
-void triangleFan();
-void triangleCircle();
+void drawCone(float x, float y, float z, float radius);
+void specialKeys(int key, int x, int y);
 
-void triangle() {
-	glBegin(GL_TRIANGLES);
+int step = 0;
 
-	glVertex2f(0.0f, 0.0f);    // V0
-	glVertex2f(25.0f, 25.0f);  // V1
-	glVertex2f(50.0f, 0.0f);   // V2
+void specialKeys(int key, int x, int y)
+{
+	std::cout << "special keys" << std::endl;
+	int xRot = 0, yRot = 0;
 
-	glVertex2f(-50.0f, 0.0f);  // V3
-	glVertex2f(-75.0f, 50.0f); // V4
-	glVertex2f(-25.0f, 0.0f);  // V5
+	xRot = (key == GLUT_KEY_UP) ? -1 : xRot;
+	xRot = (key == GLUT_KEY_DOWN) ? 1 : xRot;
+	yRot = (key == GLUT_KEY_LEFT) ? -1 : yRot;
+	yRot = (key == GLUT_KEY_RIGHT) ? 1 : yRot;
 
-	glEnd();
+	glRotatef(xRot, 1.0f, 0.0f, 0.0f);
+	glRotatef(yRot, 0.0f, 1.0f, 0.0f);
+
+	glutPostRedisplay();
 }
 
-void trianglesStrip() {
-	glBegin(GL_TRIANGLE_STRIP);
-	glVertex2f(0.0f, 0.0f);    // V0
-	glVertex2f(50.0f, 0.0f);   // V1
-	glVertex2f(25.0f, 25.0f);  // V2
-	glVertex2f(75.0f, 25.0f);  // V3
-	glVertex2f(50.0f, 50.0f);  // V4
-	glEnd();
-}
 
-void triangleFan() {
+void drawCone(float x, float y, float z, float radius)
+{
 	glBegin(GL_TRIANGLE_FAN);
-	glVertex2f(0.0f, 0.0f);
-	glVertex2f(0.0f, 50.0f);
-	glVertex2f(25.0f, 30.0f);
-	glVertex2f(40.0f, 0.0f);
-	glVertex2f(25.0f, -30.0f);
-	glEnd();
-}
 
-void triangleCircle() {
-
-	glBegin(GL_TRIANGLE_FAN);
-	glVertex3f(0.0f, 0.0f, 0.0f);
-	float x, y, angle;
-	for (angle = 0.0f; angle < (2.0f*M_PI); angle += (M_PI / 8.0f))
+	glVertex3f(x, y, z);
+	float angle;
+	for (angle = 0.0f; angle < (2.0f*GL_PI); angle += (GL_PI / 8.0f))
 	{
-		x = 50.0f*sin(angle);
-		y = 50.0f*cos(angle);
+		x = radius*sin(angle);
+		y = radius*cos(angle);
+		//change the colour of each line
+		glColor3f(step % 2 == 0, step % 2, 0.0f);
+		step++;
 
 		glVertex2f(x, y);
 	}
 	glEnd();
-
 }
 
 void renderScene(void)
 {
-	glClear(GL_COLOR_BUFFER_BIT);
-	//triangle();
-	//trianglesStrip();
-	//triangleFan();
-	triangleCircle();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
+	//front face clockwise
+	glFrontFace(GL_CW);
+	drawCone(0, 0, 75, 50);
+	//front face counterclockwise
+	glFrontFace(GL_CCW);
+	drawCone(0, 0, 0, 50);
 
-	glFlush();
+	glutSwapBuffers();
 }
 
 void setupRC(void)
 {
 	//set triangles to be line only
-	glPolygonMode(GL_FRONT, GL_LINE);
+	//glPolygonMode(GL_FRONT, GL_LINE);
+	//glPolygonMode(GL_BACK, GL_LINE);
 
+	//set triangles to be solid shapes
+	glFrontFace(GL_CW);
+	glPolygonMode(GL_FRONT, GL_FILL);
 	glPolygonMode(GL_BACK, GL_LINE);
+
+	//stop colours from blending
+	glShadeModel(GL_FLAT);
+
+	//enable depth testing
+	glEnable(GL_DEPTH_TEST);
+
+	//enabling backface culling
+	glEnable(GL_CULL_FACE);
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glColor3f(0.0f, 1.0f, 0.0f);
+	//RESIZE OBJECT
 	glOrtho(-100.0f, 100.0f, -100.0f, 100.0f, -100.0f, 100.0f);
 }
 
@@ -93,6 +96,10 @@ int main(int argc, char* argv[])
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA);
 	glutCreateWindow("Lab 05");
 	glutDisplayFunc(renderScene);
+	glutSpecialFunc(specialKeys);
+
+	//requesting a depth buffer
+	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
 
 	setupRC();
 
