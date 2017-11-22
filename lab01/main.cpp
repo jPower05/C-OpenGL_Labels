@@ -9,29 +9,33 @@
 #define GL_PI 3.1415
 //LAB 4 3D Objects ..
 
+float xRot = 1;
+
 void drawCone(float x, float y, float z, float radius);
+void drawTriangleFan(float x, float y, float z, float radius);
+
 void specialKeys(int key, int x, int y);
 
 int step = 0;
 
+void timer() {
+	
+}
+
 void specialKeys(int key, int x, int y)
 {
-	std::cout << "special keys" << std::endl;
-	int xRot = 0, yRot = 0;
 
-	xRot = (key == GLUT_KEY_UP) ? -1 : xRot;
-	xRot = (key == GLUT_KEY_DOWN) ? 1 : xRot;
-	yRot = (key == GLUT_KEY_LEFT) ? -1 : yRot;
-	yRot = (key == GLUT_KEY_RIGHT) ? 1 : yRot;
+	std::cout << "key" << std::endl;
+	if (key == GLUT_KEY_UP) {
+		xRot++;
+	}
 
-	glRotatef(xRot, 1.0f, 0.0f, 0.0f);
-	glRotatef(yRot, 0.0f, 1.0f, 0.0f);
 
 	glutPostRedisplay();
 }
 
 
-void drawCone(float x, float y, float z, float radius)
+void drawTriangleFan(float x, float y, float z, float radius)
 {
 	glBegin(GL_TRIANGLE_FAN);
 
@@ -50,30 +54,50 @@ void drawCone(float x, float y, float z, float radius)
 	glEnd();
 }
 
+void drawCone(float x, float y, float z, float radius) {
+	//cone sides
+	glFrontFace(GL_CW);	//clockwise
+	drawTriangleFan(x, y, z, radius);
+	//base
+	glFrontFace(GL_CCW);	//counterclockwise
+	drawTriangleFan(x, y, z, radius);
+
+}
+
 void renderScene(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
-	//front face clockwise
-	glFrontFace(GL_CW);
-	drawCone(0, 0, 75, 50);
-	//front face counterclockwise
-	glFrontFace(GL_CCW);
-	drawCone(0, 0, 0, 50);
+	glPushMatrix();
+	//translate from origin to 50,50,0
+		glTranslatef(50, 50, 0);
+		glRotatef(xRot, 1, 0, 0);
+	//draw cone at new origin position
+		drawCone(0, 0, 25, 25);
+		
+	glPopMatrix();
 
-	glutSwapBuffers();
+	glPushMatrix();
+	glTranslatef(-50, -50, 0);
+	glRotatef(xRot, 1, 0, 0);
+	drawCone(0, 0, 25, 25);
+	glPopMatrix();
+	
+	glFlush();
+
 }
 
 void setupRC(void)
 {
 	//set triangles to be line only
-	//glPolygonMode(GL_FRONT, GL_LINE);
-	//glPolygonMode(GL_BACK, GL_LINE);
+	//glFrontFace(GL_CW);
+	glPolygonMode(GL_FRONT, GL_LINE);
+	glPolygonMode(GL_BACK, GL_LINE);
 
 	//set triangles to be solid shapes
-	glFrontFace(GL_CW);
-	glPolygonMode(GL_FRONT, GL_FILL);
-	glPolygonMode(GL_BACK, GL_LINE);
+	//glFrontFace(GL_CW);
+	//glPolygonMode(GL_FRONT, GL_FILL);
+	//glPolygonMode(GL_BACK, GL_LINE);
 
 	//stop colours from blending
 	glShadeModel(GL_FLAT);
@@ -99,7 +123,7 @@ int main(int argc, char* argv[])
 	glutSpecialFunc(specialKeys);
 
 	//requesting a depth buffer
-	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
+	//glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
 
 	setupRC();
 
