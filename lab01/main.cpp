@@ -4,6 +4,8 @@
 #include "freeglut.h"
 #include<iostream>
 
+//ASSIGNMENT 2 MULTIPLE VIEWPORT MODEL VIEWER
+
 using namespace std;
 
 void update();
